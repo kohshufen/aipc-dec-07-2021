@@ -1,0 +1,2 @@
+The IP address of the droplet is 128.199.184.149.
+The public key's fingerprint is a4:6e:8f:82:8d:a7:94:44:95:5f:78:44:ae:20:e8:e3.
