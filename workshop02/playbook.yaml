@@ -1,0 +1,62 @@
+- name: Install server
+  hosts: all
+  tasks:
+  - name: Task 2a - Install patches
+    apt:
+      update_cache: yes
+      name: "*"
+      state: latest
+  - name: Reboot the machine with all defaults using Ansible
+    reboot:
+  - name: Task 3a - Install packages (GIT, SSH,Ansible, packer, nginx)
+    apt:
+      name: "{{ item }}"
+      update_cache: yes
+      state: present
+    loop:
+    - git
+    - ssh
+    - ansible
+    - packer
+    - nginx
+  - name: Install unzip
+    apt: pkg=unzip=6.0* state=present  
+  - name: Task 3b - Install terraform
+    unarchive:
+      src: https://releases.hashicorp.com/terraform/1.0.11/terraform_1.0.11_linux_amd64.zip
+      dest: /usr/local/bin
+      remote_src: true
+  - name: Install docker
+  # - name: Install aptitude using apt
+    apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
+
+  - name: Install required system packages
+    apt: name={{ item }} state=latest update_cache=yes
+    loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
+
+  - name: Add Docker GPG apt Key
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
+
+  - name: Add Docker Repository
+    apt_repository:
+      repo: deb https://download.docker.com/linux/ubuntu bionic stable
+      state: present
+
+  - name: Update apt and install docker-ce
+    apt: update_cache=yes name=docker-ce state=latest
+
+  - name: Install Docker Module for Python
+    pip:
+      name: docker
+
+  - name: Pull default Docker image
+    docker_image:
+      name: hello-world
+      source: pull                
+  - name:  Task 6 - Install ngingx Step X - Enable nginx
+    systemd:
+      name: nginx 
+      enabled: yes
+      state: started

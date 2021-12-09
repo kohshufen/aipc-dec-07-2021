@@ -1,0 +1,27 @@
+- name: Install tools
+  hosts: all
+  tasks:
+  - name: Task 2- Install patches
+    apt:
+      update_cache: yes
+      name: "*"
+      state: latest
+  - name: Task 2- Reboot server
+    reboot:
+  - name: Task 3- Install Git
+    apt:
+      name: git
+      state: present
+      update_cache: yes
+  - name: Task 3- Install SSH
+    apt:
+      name: openssh-server
+      state: present
+      update_cache: yes
+  # - name: Task 3- Install Docker
+    
+  # - name: Task 3- Ansible
+  # - name: Task 3- Terraform
+  # - name: Task 3- Packer
+  # - name: Task 3- Docker machine
+

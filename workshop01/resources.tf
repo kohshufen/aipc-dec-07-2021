@@ -27,6 +27,17 @@ resource "digitalocean_droplet" "web" {
           "systemctl start nginx"
       ]
   }
+
+  provisioner "file" {
+      source = local_file.nginx-conf.filename #if put string terraform will not know this file need to be created first
+      destination = "/etc/nginx/nginx.conf"
+  }
+  
+  provisioner remote-exec {
+      inline = [
+           "nginx -s reload"
+      ]
+  }   
 }
 
 output public_ip {
@@ -57,3 +68,50 @@ resource local_file droplet_info {
     }) 
     file_permission = "0644"
 }
+
+//docker
+data docker_image dov-image {
+    name = var.app_image
+}
+
+resource docker_container dov-container {
+    count = var.app_count
+    name = "dov-${count.index}"
+    image = data.docker_image.dov-image.id
+    ports {
+        internal = 3000
+    }
+    env = ["INSTANCE_NAME=dov-${count.index}"]
+}
+
+output app-ports {
+    value = flatten(docker_container.dov.contatiner[*].ports[*].external)
+}
+
+resource local_file nginx-conf {
+    filename = "nginx.conf"
+    file_permission = 0644 #read
+    content = templatefile("nginx.conf.tpl", {
+        docker_host = var.docker_host
+        ports = flatten(docker_container.dov.contatiner[*].ports[*].external)
+    })
+}
+
+// cloudflare
+data cloudflare_zone myzone {
+    name = var.CF_zone
+    # A record use ip
+    # CNAME use domain
+}
+
+resource cloudflare_record a-dov {
+    zone_id = data.cloudflare_zone.myzone.zone_id
+    name = "dov"
+    type = "A"
+    value = digitalocean_droplet.web.ipv4_address
+    proxied = true
+}
+
+## generate graph
+#terraform graph > resource-dep.dot
+#dot -Tpng 

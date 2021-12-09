@@ -1,0 +1,7 @@
+all:
+  hosts:
+    myserver:
+      ansible_host: 188.166.220.169
+      ansible_user: root
+      ansible_connection: ssh
+      ansible_private_key_file: ../../tmp/aipc-07-dec-2021
