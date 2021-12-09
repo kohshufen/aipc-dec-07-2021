@@ -1,0 +1,194 @@
+- name: Setup server
+  hosts: all
+  become: yes
+  tasks:
+  - name: Creates directory
+    file:
+      path: "{{ item }}"
+      state: directory
+    loop:
+      - ~/code-server
+      - /var/lib/code-server
+  - name: Change directory
+    shell: |
+      cd ~/code-server
+  
+  - name: Install mandatory packages
+    apt:
+      update_cache: yes
+      name: "{{ item }}"
+      state: latest
+    loop:
+    - unzip
+
+  - name: Download and extract
+    unarchive:
+      src: "{{ item }}"
+      dest: ~/code-server
+      remote_src: yes
+      mode: "a+x"
+    loop:
+    - https://github.com/cdr/code-server/releases/download/v3.12.0/code-server-3.12.0-linux-amd64.tar.gz
+  
+  - name: Setup
+    copy:
+      src: ~/code-server/code-server-3.12.0-linux-amd64 
+      dest: /usr/lib/code-server
+
+
+    # shell: |
+    #   cd ~/code-server
+    #   sudo cp -r code-server-3.12.0-linux-amd64 /usr/lib/code-server
+    #   sudo ln -s /usr/lib/code-server/bin/code-server /usr/bin/code-server
+
+  # - name: Add Docker apt key
+  #   apt_key:
+  #     url: https://download.docker.com/linux/ubuntu/gpg
+  #     state: present
+  # - name: Add repositories
+  #   apt_repository:
+  #     repo: "{{ item }}"
+  #     state: present
+  #   loop:
+  #   - "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+  #   - "ppa:ansible/ansible"
+  # - name: Install Docker and Ansible
+  #   apt:
+  #     update_cache: yes
+  #     name: "{{ item }}"
+  #     state: latest
+  #   loop:
+  #   - docker-ce 
+  #   - docker-ce-cli 
+  #   - containerd.io
+  #   - ansible
+  # - name: Install Hashicorp tools
+  #   unarchive:
+  #     src: "{{ item }}"
+  #     dest: /usr/local/bin
+  #     remote_src: yes
+  #     mode: "a+x"
+  #   loop:
+  #   - https://releases.hashicorp.com/terraform/1.1.0/terraform_1.1.0_linux_amd64.zip
+  #   - https://releases.hashicorp.com/packer/1.7.8/packer_1.7.8_linux_amd64.zip
+  # - name: Install docker-machine
+  #   get_url:
+  #     url: https://gitlab-docker-machine-downloads.s3.amazonaws.com/main/docker-machine-Linux-x86_64
+  #     dest: /usr/local/bin/docker-machine
+  #     mode: "a+x"
+
+  # - name: Create user fred
+  #   user: 
+  #     name: fred
+  #     shell: /bin/bash
+  #     groups: docker,sudo
+  #     append: yes
+  #     state: present
+  # - name: add ssh keys to fred
+  #   authorized_key:
+  #     user: fred
+  #     state: present
+  #     key: "{{ lookup('file', public_key_file) }}"
+  # - name: add instructor's SSH key
+  #   authorized_key:
+  #     user: fred
+  #     state: present
+  #     key: https://drive.google.com/u/0/uc?id=17pBBYJhRkyrfVhLu44e23CA2PbeXPuMg&export=download
+
+  # - name: List all files in /var/www/html
+  #   find:
+  #     paths: /var/www/html
+  #     recurse: yes 
+  #   register: html_files 
+  # - name: echo html_files
+  #   debug:
+  #     msg: ">>> {{ html_files }}"
+  # - name: delete files from /var/www/html
+  #   file:
+  #     name: "{{ item.path }}"
+  #     state: absent
+  #   loop: "{{ html_files.files }}"
+  # - name: Copy HTML files over to server
+  #   copy:
+  #     src: ./nginx-assets/ 
+  #     dest: /var/www/html/
+
+  # - name: Start nginx
+  #   systemd:
+  #     name: nginx
+  #     enabled: true
+  #     state: restarted
+
+  # - name: Install all recomended patches
+  #   apt:
+  #     update_cache: yes 
+  #     upgrade: dist
+  #     state: latest
+
+  # - name: Reboot server
+  #   reboot:
+  ##Note: skip the reboot steps when running packer. otherwise it will mess up the process.
+
+      
+# - name: Install server
+#   hosts: all
+#   tasks:
+#   - name: Task 2a - Install patches
+#     apt:
+#       update_cache: yes
+#       name: "*"
+#       state: latest
+#   - name: Reboot the machine with all defaults using Ansible
+#     reboot:
+#   - name: Task 3a - Install packages (GIT, SSH,Ansible, packer, nginx)
+#     apt:
+#       name: "{{ item }}"
+#       update_cache: yes
+#       state: present
+#     loop:
+#     - git
+#     - ssh
+#     - ansible
+#     - packer
+#     - nginx
+#   - name: Install unzip
+#     apt: pkg=unzip=6.0* state=present  
+#   - name: Task 3b - Install terraform
+#     unarchive:
+#       src: https://releases.hashicorp.com/terraform/1.0.11/terraform_1.0.11_linux_amd64.zip
+#       dest: /usr/local/bin
+#       remote_src: true
+#   - name: Install docker
+#   # - name: Install aptitude using apt
+#     apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
+
+#   - name: Install required system packages
+#     apt: name={{ item }} state=latest update_cache=yes
+#     loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
+
+#   - name: Add Docker GPG apt Key
+#     apt_key:
+#       url: https://download.docker.com/linux/ubuntu/gpg
+#       state: present
+
+#   - name: Add Docker Repository
+#     apt_repository:
+#       repo: deb https://download.docker.com/linux/ubuntu bionic stable
+#       state: present
+
+#   - name: Update apt and install docker-ce
+#     apt: update_cache=yes name=docker-ce state=latest
+
+#   - name: Install Docker Module for Python
+#     pip:
+#       name: docker
+
+#   - name: Pull default Docker image
+#     docker_image:
+#       name: hello-world
+#       source: pull                
+#   - name:  Task 6 - Install ngingx Step X - Enable nginx
+#     systemd:
+#       name: nginx 
+#       enabled: yes
+#       state: started
