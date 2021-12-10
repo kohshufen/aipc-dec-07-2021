@@ -12,15 +12,15 @@ terraform {
     }
   }
 
-  backend s3 {
-    region = "sgp1"
-    endpoint = "sgp1.digitaloceanspaces.com"
-    bucket =  "bigbucket-ksf"
-    key = "states/code-server-build.tfstate"
-    skip_credentials_validation = true
-    skip_region_validation = true
-    skip_metadata_api_check = true
-  }
+  # backend s3 {
+  #   region = "sgp1"
+  #   endpoint = "sgp1.digitaloceanspaces.com"
+  #   bucket =  "bigbucket-ksf"
+  #   key = "states/code-server-build.tfstate"
+  #   skip_credentials_validation = true
+  #   skip_region_validation = true
+  #   skip_metadata_api_check = true
+  # }
 }
 
 provider "digitalocean" {
